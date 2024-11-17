@@ -1,6 +1,7 @@
 package models;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class Cart {
     private ArrayList<OrderItem> items;
@@ -10,6 +11,10 @@ public class Cart {
     }
 
     public void addProduct(Product product, int quantity){
+        if (quantity <=0){
+            System.out.println("Quantity must be greater than zero.");
+            return;
+        }
         if (quantity > product.getQuantity()) {
             System.out.println("Cannot add " + quantity + " " + product.getName() + " to the cart. Not enough stock available.");
             return;
@@ -64,7 +69,17 @@ public class Cart {
         System.out.println("Total Cart value is: "+totalCartValue+"€");
         System.out.println();
     }
-    public ArrayList<OrderItem> getItems(){
+    public List<OrderItem> getItems(){
         return items;
+    }
+    public List<Product> getCartProducts(){
+        List<Product> products = new ArrayList<>();
+        for(OrderItem item: items){
+            products.add(item.getProduct());
+        }
+        return products;
+    }
+    public void clearCart(){
+        items.clear();
     }
 }

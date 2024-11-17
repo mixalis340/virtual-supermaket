@@ -1,13 +1,23 @@
 package models;
 
+import api.OrderManager;
+import api.ProductManager;
+
+import java.util.ArrayList;
 import java.util.List;
 
 public class Customer extends User{
     private Cart cart;
     private List<Order> orderHistory;
+    private OrderManager orderManager;
+    private ProductManager productManager;
 
-    public Customer(String username, String password){
-        super(username, password, "Customer");
+    public Customer(String username, String password, ProductManager productManager){
+        super(username, password, "Customer", productManager);
+        this.cart = new Cart();
+        this.orderHistory = new ArrayList<>();
+        this.orderManager = new OrderManager();
+        this.productManager = productManager;
     }
 
     @Override
@@ -20,28 +30,29 @@ public class Customer extends User{
         return false;
     }
 
-    public void searchProduct() {
 
+    public void addToCart(Product product, int quantity) {
+        cart.addProduct(product, quantity);
     }
 
-    public void addToCart() {
-
+    public void removeFromCart(int productId) {
+        cart.removeItem(productId);
     }
 
-    public void removeFromCart() {
-
+    public void displayCart(){
+        cart.displayCartInfo();
     }
 
-    public boolean updateCartQuantity() {
-      return false;
+    public boolean updateCartQuantity(int productId, int newQuantity) {
+        return cart.updateItemQuantity(productId, newQuantity);
     }
 
     public void placeOrder() {
-
+        orderManager.makeOrder(cart, orderHistory, productManager);
     }
 
-    public List<Order> viewOrderHistory() {
-       return null;
+    public void displayOrderHistory() {
+       orderManager.displayOrderHistory(orderHistory);
     }
 
 }

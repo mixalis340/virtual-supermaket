@@ -1,8 +1,12 @@
 package models;
 
+import api.ProductManager;
+
 public class Admin extends User {
-    public Admin(String username, String password){
-        super(username, password, "Admin");
+    ProductManager productManager;
+    public Admin(String username, String password, ProductManager productManager){
+        super(username, password, "Admin", productManager);
+        this.productManager = productManager;
     }
 
     @Override
@@ -15,20 +19,17 @@ public class Admin extends User {
         return false;
     }
 
-    public void addProduct(){
-
+    public void addProduct(Product product){
+        productManager.addProduct(product);
     }
-    public void removeProduct(){
-
+    public void removeProduct(Product product){
+        productManager.removeProduct(product);
     }
-    public void findProduct(){
-
-    }
-    public void editProduct(){
-
+    public void editProduct(Product product){
+        productManager.editProduct(product);
     }
 
     public void showStatistics(){
-
+        productManager.getAllProducts();
     }
 }

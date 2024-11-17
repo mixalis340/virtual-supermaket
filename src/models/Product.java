@@ -11,9 +11,11 @@ public class Product {
     private int quantity;
 
 
-    public Product(String name, int quantity, double price){
+    public Product(String name, String category,String subcategory,int quantity, double price){
         this.id = idCounter++;
         this.name = name;
+        this.category = category;
+        this.subcategory = subcategory;
         this.quantity = quantity;
         this.price = price;
     }

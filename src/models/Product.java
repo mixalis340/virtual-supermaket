@@ -1,23 +1,22 @@
 package models;
 
-public class Product {
+public abstract class Product {
     private static int idCounter = 1;
     private final int id;
     private String name;
-    private String category;
+    private Category category;
     private String subcategory;
     private String description;
     private double price;
-    private int quantity;
 
 
-    public Product(String name, String category,String subcategory,int quantity, double price){
+    public Product(String name, String description, Category category,String subcategory,  double price){
         this.id = idCounter++;
         this.name = name;
-        this.category = category;
-        this.subcategory = subcategory;
-        this.quantity = quantity;
+        this.description = description;
         this.price = price;
+        this.category = category;
+        this.subcategory = this.category.getSubcategory(subcategory);
     }
     public int getId(){
         return this.id;
@@ -31,14 +30,11 @@ public class Product {
         this.name = name;
     }
 
-    public String getCategory() {return category;}
+    public Category getCategory() {return category;}
 
-    public void setCategory(String category) {this.category = category;}
-
-    public String getSubcategory() {return subcategory;}
-
-    public void setSubcategory(String subcategory) {this.subcategory = subcategory;}
-
+    public void setCategory(Category category){this.category = category;}
+    public String getSubcategory(){return subcategory;}
+    public void setSubcategory(String subcategory){this.subcategory = subcategory;}
     public String getDescription() {
         return description;
     }
@@ -55,12 +51,7 @@ public class Product {
         this.price = price;
     }
 
-    public int getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
-    }
-
+    public abstract int getQuantity();
+    public abstract void setQuantity(int quantity);
+    public abstract String getUnit();
 }

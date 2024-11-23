@@ -1,5 +1,6 @@
 package api;
 
+import models.Category;
 import models.Product;
 
 import java.util.ArrayList;
@@ -8,9 +9,11 @@ import java.util.Scanner;
 
 public class ProductManager {
     private List<Product> products;
+    private CategoryManager categoryManager;
 
-    public ProductManager(){
-        this.products = new ArrayList<>();
+    public ProductManager(List<Product> products, CategoryManager categoryManager){
+        this.products = products;
+        this.categoryManager = categoryManager;
     }
 
     public List<Product> getProducts(){
@@ -33,12 +36,9 @@ public class ProductManager {
         }
     }
 
-    public void editProduct(Product product){
-        if(!products.contains(product)){
-            System.out.println("This project does not exist.");
-        }else {
+    public void editProduct(int productId){
             for(Product productToEdit: products){
-                if(productToEdit.getId() == product.getId()){
+                if(productId == productToEdit.getId()){
                     Scanner scanner = new Scanner(System.in);
                     boolean editing = true;
 
@@ -62,10 +62,22 @@ public class ProductManager {
                                 break;
 
                             case 2:
+                                System.out.println("Available categories:");
+                                for (Category category: categoryManager.getCategories()){
+                                    System.out.println(category.getTitle());
+                                }
                                 System.out.print("Enter new category: ");
                                 String newCategory = scanner.nextLine();
-                                productToEdit.setCategory(newCategory);
-                                System.out.println("Category updated to: " + newCategory);
+                                Category category = categoryManager.getCategoryByTitle(newCategory);
+                                System.out.println("Available subcategories: ");
+                                System.out.println(category.getSubcategories());
+                                System.out.println("Choose new subcategory: ");
+                                String newSubCategory = scanner.nextLine();
+                                newSubCategory = category.getSubcategory(newSubCategory);
+                                productToEdit.setCategory(category);
+                                productToEdit.setSubcategory(newSubCategory);
+                                System.out.println("Category updated to: " + productToEdit.getCategory().getTitle());
+                                System.out.println("SubCategory updated to: "+ productToEdit.getSubcategory());
                                 break;
 
                             case 3:
@@ -93,7 +105,6 @@ public class ProductManager {
                 }
             }
         }
-    }
 
     public void giveProducts(String title, String category, String subcategory){
         List<Product> results = new ArrayList<>();
@@ -101,7 +112,7 @@ public class ProductManager {
 
         for (Product product : products) {
             boolean matchesTitle = title == null || product.getName().toLowerCase().contains(title.toLowerCase());
-            boolean matchesCategory = category == null || product.getCategory().toLowerCase().contains(category.toLowerCase());
+            boolean matchesCategory = category == null || product.getCategory().getTitle().toLowerCase().contains(category.toLowerCase());
             boolean matchesSubcategory = subcategory == null || product.getSubcategory().toLowerCase().contains(subcategory.toLowerCase());
 
             if (matchesTitle && matchesCategory && matchesSubcategory) {
@@ -113,7 +124,7 @@ public class ProductManager {
         } else {
             System.out.println("Search Results:");
             for (Product product : results) {
-                System.out.println("ID: " + product.getId() + ", Name: " + product.getName() + ", Category: " + product.getCategory() + ", Subcategory: " + product.getSubcategory());
+                System.out.println("ID: " + product.getId() + ", Name: " + product.getName() + ", Category: " + product.getCategory().getTitle() + ", Subcategory: " + product.getSubcategory());
             }
             System.out.println();
             System.out.println("Give the ID of the product you want to see:");
@@ -130,7 +141,7 @@ public class ProductManager {
                 System.out.println("Product info:");
                 System.out.println("Product id: "+product.getId());
                 System.out.println("Name: "+product.getName());
-                System.out.println("Quantity: "+product.getQuantity());
+                System.out.println("Quantity: "+product.getQuantity() + product.getUnit());
                 break;
             }
         }
@@ -147,9 +158,10 @@ public class ProductManager {
             for (Product product : products) {
                 System.out.println("Product ID: " + product.getId());
                 System.out.println("Name: " + product.getName());
-                System.out.println("Category: " + product.getCategory());
+                System.out.println("Category: " + product.getCategory().getTitle());
+                System.out.println("Subcategory " + product.getSubcategory());
                 System.out.println("Price: " + product.getPrice());
-                System.out.println("Quantity: " + product.getQuantity());
+                System.out.println("Quantity: "+product.getQuantity() + product.getUnit());
                 System.out.println();
             }
         }

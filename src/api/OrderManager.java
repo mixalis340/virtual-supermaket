@@ -3,20 +3,18 @@ import models.Cart;
 import models.Order;
 import models.OrderItem;
 import models.Product;
-
 import java.util.List;
 
 public class OrderManager {
 
     public OrderManager(){
-
     }
-    public void makeOrder(Cart cart, List<Order> orderHistory, ProductManager productManager){
+    public void makeOrder(Cart cart, List<Order> orderHistory, ProductManager productManager,int orderNumber){
         if(cart.getItems().isEmpty()){
             System.out.println("Cart is empty. Cannot place an order.");
             return;
         }
-        orderHistory.add(new Order(cart.getItems(),cart.getTotalCartValue()));
+        orderHistory.add(new Order(cart.getItems(),cart.getTotalCartValue(), orderNumber));
 
         updateProductQuantities(cart.getItems(),productManager.getProducts());
 

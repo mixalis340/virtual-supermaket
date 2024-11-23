@@ -25,8 +25,8 @@ public class Admin extends User {
     public void removeProduct(Product product){
         productManager.removeProduct(product);
     }
-    public void editProduct(Product product){
-        productManager.editProduct(product);
+    public void editProduct(int productId){
+        productManager.editProduct(productId);
     }
 
     public void showStatistics(){

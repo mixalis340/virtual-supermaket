@@ -12,11 +12,11 @@ public class Customer extends User{
     private OrderManager orderManager;
     private ProductManager productManager;
 
-    public Customer(String username, String password, ProductManager productManager){
+    public Customer(String username, String password, ProductManager productManager, OrderManager orderManager){
         super(username, password, "Customer", productManager);
         this.cart = new Cart();
         this.orderHistory = new ArrayList<>();
-        this.orderManager = new OrderManager();
+        this.orderManager = orderManager;
         this.productManager = productManager;
     }
 
@@ -48,7 +48,7 @@ public class Customer extends User{
     }
 
     public void placeOrder() {
-        orderManager.makeOrder(cart, orderHistory, productManager);
+        orderManager.makeOrder(cart, orderHistory, productManager, orderHistory.size() + 1);
     }
 
     public void displayOrderHistory() {

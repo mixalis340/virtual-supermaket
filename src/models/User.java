@@ -23,7 +23,7 @@ public abstract class User {
     }
 
     public String getRole(){
-        return role;
+        return role.toLowerCase();
     }
 
     public void giveProducts(String title, String category, String subcategory){

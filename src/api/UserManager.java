@@ -1,5 +1,6 @@
 package api;
 
+import models.Admin;
 import models.User;
 
 import java.util.ArrayList;
@@ -7,6 +8,7 @@ import java.util.List;
 
 public class UserManager {
     private List<User> users;
+    private ProductManager productManager;
 
     public UserManager(){
         this.users = new ArrayList<>();

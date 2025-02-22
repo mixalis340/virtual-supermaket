@@ -1,19 +1,19 @@
 package api;
 
 import models.Category;
+import models.Order;
+import models.OrderItem;
 import models.Product;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 public class ProductManager {
     private List<Product> products;
     private CategoryManager categoryManager;
 
-    public ProductManager(List<Product> products, CategoryManager categoryManager){
-        this.products = products;
+    public ProductManager(CategoryManager categoryManager, List<Product> products){
         this.categoryManager = categoryManager;
+        this.products = products;
     }
 
     public List<Product> getProducts(){
@@ -105,6 +105,55 @@ public class ProductManager {
                 }
             }
         }
+
+        public List<Product> mostPopularProduct(List<Order> totalOrders){
+            Map<Product, Integer> products = new HashMap<>();
+
+            for (Order order: totalOrders){
+                Set<Product> uniqueProductsInOrder = new HashSet<>();
+                for (OrderItem orderItem: order.getOrderItems()){
+                    uniqueProductsInOrder.add(orderItem.getProduct());
+                }
+
+                for (Product product : uniqueProductsInOrder) {
+                    if (products.containsKey(product)) {
+                        products.put(product, products.get(product) + 1);
+                    } else {
+                        products.put(product, 1);
+                    }
+                }
+            }
+
+            int maxCount = 0;
+            for (int count : products.values()) {
+                if (count > maxCount) {
+                    maxCount = count;
+                }
+            }
+
+            List<Product> mostPopularProducts = new ArrayList<>();
+            for (Map.Entry<Product, Integer> entry : products.entrySet()) {
+                if (entry.getValue() == maxCount) {
+                    mostPopularProducts.add(entry.getKey());
+                }
+            }
+
+            return mostPopularProducts;
+        }
+
+        public List<Product> getUnavailableProducts(){
+            List<Product> unavailableProducts = new ArrayList<>();
+
+            for (Product product: products){
+                if (product.getQuantity() == 0){
+                    unavailableProducts.add(product);
+                }
+            }
+            if (unavailableProducts.isEmpty()){
+                return null;
+            }
+            return unavailableProducts;
+         }
 
     public void giveProducts(String title, String category, String subcategory){
         List<Product> results = new ArrayList<>();

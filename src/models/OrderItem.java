@@ -22,6 +22,7 @@ public class OrderItem {
     }
 
     public double getTotalPrice(){
-        return quantity * price;
+        double value = quantity * price;
+        return Math.round(value * 100.0) / 100.0;
     }
 }

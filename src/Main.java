@@ -25,27 +25,15 @@ public class Main {
 
         userManager.registerUser(admin);
 
-        MainFrame mainFrame = new MainFrame(userManager, products);
 
+        MainFrame mainFrame = new MainFrame(userManager, products, categoryManager);
+
+//        int[] array = {5,5,5,5};
+//        test(array);
     }
 
-    public static void test(String string) {
+    public static void test(int[] array) {
 
-        char[] charString = string.toCharArray();
-
-        char[] reversedString = new char[charString.length];
-
-        int j = 0;
-        for (int i = charString.length-1; i >= 0; i--){
-            reversedString[j] = charString[i];
-            j++;
-        }
-
-        if (Arrays.equals(reversedString, charString)) {
-            System.out.println("It is palindrome");
-            return;
-        }
-        System.out.println("No palindrome");
     }
 
 }

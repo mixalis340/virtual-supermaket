@@ -1,18 +1,14 @@
 package gui;
 
+import api.CategoryManager;
 import models.Product;
 
 import javax.swing.*;
 import java.awt.*;
 
 public class ProductRegistrationPanel extends ProductFormPanel {
-    public ProductRegistrationPanel(MainFrame parentFrame) {
-        super(parentFrame);
-    }
-
-    @Override
-    protected void setTitleLabel(String title) {
-        return;
+    public ProductRegistrationPanel(MainFrame parentFrame, CategoryManager categoryManager) {
+        super(parentFrame, categoryManager);
     }
 
     @Override
@@ -27,11 +23,6 @@ public class ProductRegistrationPanel extends ProductFormPanel {
 
     @Override
     protected JTextField getNameField(){
-        return new JTextField();
-    }
-
-    @Override
-    protected JTextField getCategoryField() {
         return new JTextField();
     }
 

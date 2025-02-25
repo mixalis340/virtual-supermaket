@@ -3,6 +3,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import models.Product;
+
+import java.util.ArrayList;
 import java.util.List;
 
 public class AdminPanel extends JPanel {
@@ -11,6 +13,7 @@ public class AdminPanel extends JPanel {
     private JTextField searchField;
     private JButton searchButton;
     private JComboBox<String> filterDropdown;
+    private JPanel gridPanel;
 
     public AdminPanel(MainFrame parentFrame,List<Product> products) {
         this.parentFrame = parentFrame;
@@ -20,8 +23,7 @@ public class AdminPanel extends JPanel {
         JPanel topBarPanel = createTopBar();
         add(topBarPanel, BorderLayout.NORTH);
 
-        JPanel gridPanel = createProductGridPanel();
-
+        gridPanel = createProductGridPanel();
         JScrollPane jScrollPane = new JScrollPane(gridPanel);
         add(jScrollPane, BorderLayout.CENTER);
 
@@ -65,6 +67,16 @@ public class AdminPanel extends JPanel {
             addActionButtons(productRowPanel, product);
         }
         return gridPanel;
+    }
+    private void updateProductGrid(List<Product> filteredProducts) {
+        gridPanel.removeAll();
+        for (Product product : filteredProducts) {
+            ProductRowPanel productRowPanel = new ProductRowPanel(product);
+            gridPanel.add(productRowPanel);
+            addActionButtons(productRowPanel, product);
+        }
+        gridPanel.revalidate();
+        gridPanel.repaint();
     }
 
     // Helper method to add action buttons to each product row

@@ -3,7 +3,10 @@ package gui;
 import javax.swing.*;
 import java.awt.*;
 import java.util.List;
+
+import api.CategoryManager;
 import api.UserManager;
+import models.Category;
 import models.Product;
 import models.User;
 
@@ -18,8 +21,9 @@ public class MainFrame extends JFrame {
     private ProductEditPanel productEditPanel;
     private List<Product> products;
     private JMenuItem backItem;
+    private CategoryManager categoryManager;
 
-    public MainFrame(UserManager userManager, List<Product> products){
+    public MainFrame(UserManager userManager, List<Product> products, CategoryManager categoryManager){
         setTitle("Virtual-Supermarket");
         setSize(800, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -28,11 +32,12 @@ public class MainFrame extends JFrame {
         this.contentPanel = new JPanel(cardLayout);
         this.products = products;
         this.backItem = new JMenuItem("Back");
+        this.categoryManager = categoryManager;
 
         adminPanel = new AdminPanel(this, products); // Pass MainFrame to allow screen switching
         loginPanel = new LoginPanel(userManager, this);
-        productRegistrationPanel = new ProductRegistrationPanel(this);
-        productEditPanel = new ProductEditPanel(this, null);// Add Product Registration screen
+        productRegistrationPanel = new ProductRegistrationPanel(this, categoryManager);
+        productEditPanel = new ProductEditPanel(this, null, categoryManager);// Add Product Registration screen
 
 
         // Add all panels to CardLayout

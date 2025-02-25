@@ -1,16 +1,22 @@
 package gui;
+import api.CategoryManager;
+import models.Category;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.List;
 
 public abstract class ProductFormPanel extends JPanel {
     private final MainFrame parentFrame;
-    protected JTextField nameField, categoryField, priceField, quantityField;
+    protected JTextField nameField, categoryField, priceField, quantityField, typeField;
+    protected JComboBox<String> categoryComboBox, subCategoryComboBox;
     private JButton saveButton, backButton;
     protected JLabel statusLabel, titleLabel;
+    protected CategoryManager categoryManager;
 
-    public ProductFormPanel(MainFrame parentFrame){
+    public ProductFormPanel(MainFrame parentFrame, CategoryManager categoryManager){
         this.parentFrame = parentFrame; // Store reference to MainFrame
+        this.categoryManager = categoryManager;
         setLayout(new BorderLayout());
 
         addTitle();
@@ -25,11 +31,9 @@ public abstract class ProductFormPanel extends JPanel {
         add(titleLabel, BorderLayout.NORTH);
         System.out.println("Title is: " + titleLabel.getText());
     }
-    protected abstract void setTitleLabel(String title);
     protected abstract String getTitleLabel();
     protected abstract String getSaveButtonText();
     protected abstract JTextField getNameField();
-    protected abstract JTextField getCategoryField();
     protected abstract JTextField getPriceField();
     protected abstract JTextField getQuantityField();
 
@@ -40,21 +44,30 @@ public abstract class ProductFormPanel extends JPanel {
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
         nameField = getNameField();
-        categoryField = getCategoryField();
         priceField = getPriceField();
         quantityField = getQuantityField();
+        typeField = new JTextField();
+        typeField.setEditable(false);
+
+        categoryComboBox = new JComboBox<>();
+        subCategoryComboBox = new JComboBox<>();
+        loadCategories();
+        loadSubCategories();
+        displaySubcategoryType();
 
         addLabeledField("Όνομα προϊόντος:", nameField, 0, gbc, formPanel);
-        addLabeledField("Κατηγορία:", categoryField, 1, gbc, formPanel);
-        addLabeledField("Τιμή:", priceField, 2, gbc, formPanel);
-        addLabeledField("Ποσότητα:", quantityField, 3, gbc, formPanel);
+        addLabeledField("Κατηγορία:", categoryComboBox, 1, gbc, formPanel);
+        addLabeledField("Υπό-Κατηγορία",subCategoryComboBox,2,gbc,formPanel);
+        addLabeledField("Τιμή:", priceField, 3, gbc, formPanel);
+        addLabeledField("Ποσότητα:", quantityField, 4, gbc, formPanel);
+        addLabeledField("Μονάδα μέτρησης:",typeField,5,gbc,formPanel);
 
         saveButton = new JButton(getSaveButtonText());
         statusLabel = new JLabel("", SwingConstants.CENTER);
         statusLabel.setForeground(Color.RED);
 
         gbc.gridx = 1;
-        gbc.gridy = 4;
+        gbc.gridy = 6;
         formPanel.add(saveButton, gbc);
 
         gbc.gridy = 5;
@@ -67,11 +80,12 @@ public abstract class ProductFormPanel extends JPanel {
     private void addListeners() {
         saveButton.addActionListener(e -> handleSave());
         parentFrame.getBackItem().addActionListener(e-> {clearForm(); parentFrame.switchPanel("Admin");});
+        categoryComboBox.addActionListener(e -> loadSubCategories());
+        subCategoryComboBox.addActionListener(e -> displaySubcategoryType());
     }
 
     public void clearForm() {
         nameField.setText("");
-        categoryField.setText("");
         priceField.setText("");
         quantityField.setText("");
         statusLabel.setText("");
@@ -89,6 +103,30 @@ public abstract class ProductFormPanel extends JPanel {
         gbc.anchor = GridBagConstraints.WEST;
         field.setPreferredSize(new Dimension(200, 30));
         formPanel.add(field, gbc);
+    }
+
+    private void loadCategories() {
+        categoryComboBox.removeAllItems();
+        List<Category> categories = categoryManager.getCategories();
+        for (Category category : categories) {
+            categoryComboBox.addItem(category.getTitle());
+        }
+    }
+
+    private void loadSubCategories(){
+        subCategoryComboBox.removeAllItems();
+        Category currentCategory = categoryManager.getCategoryByTitle((String) categoryComboBox.getSelectedItem());
+        System.out.println("Current category: "+currentCategory.getTitle());
+        for (String subCategory: currentCategory.getSubcategories()){
+            subCategoryComboBox.addItem(subCategory);
+        }
+    }
+
+    public void displaySubcategoryType(){
+        Category currentCategory = categoryManager.getCategoryByTitle((String) categoryComboBox.getSelectedItem());
+        String currentSubcategory = (String) subCategoryComboBox.getSelectedItem();
+        String subCategoryType = currentCategory.getSubcategoryType(currentSubcategory);
+        typeField.setText(subCategoryType);
     }
 
     private void handleSave() {

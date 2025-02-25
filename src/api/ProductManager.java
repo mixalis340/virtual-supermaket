@@ -20,11 +20,11 @@ public class ProductManager {
         return products;
     }
     public void addProduct(Product product){
-        if (products.contains(product)){
-            System.out.println("Product already exists.");
-        } else {
-            products.add(product);
-        }
+//        if (products.contains(product)){
+//            System.out.println("Product already exists.");
+//        } else {
+//            products.add(product);
+//        }
     }
 
     public void removeProduct(Product product){

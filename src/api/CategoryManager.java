@@ -7,7 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class CategoryManager {
-    private List<Category> categories;
+    private final List<Category> categories;
     public CategoryManager(List<Category> categories){
         this.categories = categories;
     }

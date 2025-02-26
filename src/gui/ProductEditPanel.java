@@ -1,13 +1,16 @@
 package gui;
 import api.CategoryManager;
+import api.ProductManager;
+import models.Category;
 import models.Product;
 import javax.swing.*;
+import java.awt.*;
 
 public class ProductEditPanel extends ProductFormPanel {
     private Product product;
 
-    public ProductEditPanel(MainFrame parentFrame, Product product, CategoryManager categoryManager) {
-        super(parentFrame, categoryManager);
+    public ProductEditPanel(MainFrame parentFrame, Product product, CategoryManager categoryManager, ProductManager productManager,AdminPanel adminPanel) {
+        super(parentFrame, categoryManager, productManager,adminPanel);
         this.product = product;
     }
 
@@ -34,6 +37,13 @@ public class ProductEditPanel extends ProductFormPanel {
     }
 
     @Override
+    protected JTextField getDescriptionField(){
+        if (description == null) {
+            description = new JTextField(product != null ? product.getDescription() : "");
+        }
+        return description;
+    }
+    @Override
     protected JTextField getPriceField() {
         if (priceField == null) {
             priceField = new JTextField(product != null ? String.valueOf(product.getPrice()) : "");
@@ -49,7 +59,10 @@ public class ProductEditPanel extends ProductFormPanel {
         return quantityField;
     }
 
-
+    @Override
+    protected String performSave(String name, String description, Category category, String subcategory, double price, int quantity){
+        return productManager.editProduct(product,name,description,category,subcategory,price,quantity);
+    }
     private void setSelectedCategory() {
         if (product != null && product.getCategory() != null) {
             String productCategory = product.getCategory().getTitle();
@@ -79,6 +92,7 @@ public class ProductEditPanel extends ProductFormPanel {
         this.product = product;
         setTitleLabel(getTitleLabel());
         getNameField().setText(product != null ? product.getName() : "");
+        getDescriptionField().setText(product != null ? product.getDescription() : "");
         getPriceField().setText(product != null ? String.valueOf(product.getPrice()) : "");
         getQuantityField().setText(product != null ? String.valueOf(product.getQuantity()) : "");
         setSelectedCategory();

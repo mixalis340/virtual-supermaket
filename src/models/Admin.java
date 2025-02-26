@@ -19,14 +19,14 @@ public class Admin extends User {
         return false;
     }
 
-    public void addProduct(Product product){
-        productManager.addProduct(product);
+    public void addProduct(String name, String description, Category category,String subcategory,double price,int quantity,String type){
+        productManager.addProduct(name, description, category,subcategory,price,quantity,type);
     }
     public void removeProduct(Product product){
         productManager.removeProduct(product);
     }
-    public void editProduct(int productId){
-        productManager.editProduct(productId);
+    public void editProduct(Product product,String newName, String newDescription, Category newCategory, String newSubcategory, Double newPrice,int newQuantity){
+        productManager.editProduct(product,newName, newDescription,newCategory,newSubcategory,newPrice,newQuantity);
     }
 
     public void showStatistics(){

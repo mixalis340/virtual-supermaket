@@ -2,6 +2,8 @@ package gui;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
+
+import api.ProductManager;
 import models.Product;
 
 import java.util.ArrayList;
@@ -14,10 +16,15 @@ public class AdminPanel extends JPanel {
     private JButton searchButton;
     private JComboBox<String> filterDropdown;
     private JPanel gridPanel;
+    private ProductManager productManager;
+    private JLabel noProductsLabel;
 
-    public AdminPanel(MainFrame parentFrame,List<Product> products) {
+    public AdminPanel(MainFrame parentFrame,List<Product> products,ProductManager productManager) {
+        System.out.println("ADMIN CONSTRUCTOR ACTIVATED!!!!");
         this.parentFrame = parentFrame;
         this.products = products;
+        this.productManager = productManager;
+        this.noProductsLabel = new JLabel("Δεν υπάρχουν σχετικά προϊόντα");
         setLayout(new BorderLayout());
 
         JPanel topBarPanel = createTopBar();
@@ -37,10 +44,10 @@ public class AdminPanel extends JPanel {
         searchField = new JTextField(20); // TextField for search (20 characters wide)
 
         // Search button
-        searchButton = createButton("Αναζήτηση",null, new Dimension(100,25));
+        searchButton = createButton("Αναζήτηση",e->handleSearchProducts(searchField.getText()), new Dimension(100,25));
 
         filterDropdown = new JComboBox<>(new String[]{"Όλα τα προϊόντα", "Μη διαθέσιμα", "Πιο δημοφιλή"});
-        filterDropdown.addActionListener(null);
+        filterDropdown.addActionListener(e->handleFilterSelection((String) filterDropdown.getSelectedItem()));
 
         // Add search components to the top bar panel
         topBarPanel.add(searchLabel);
@@ -68,12 +75,20 @@ public class AdminPanel extends JPanel {
         }
         return gridPanel;
     }
-    private void updateProductGrid(List<Product> filteredProducts) {
+    public void updateProductGrid(List<Product> filteredProducts) {
         gridPanel.removeAll();
-        for (Product product : filteredProducts) {
-            ProductRowPanel productRowPanel = new ProductRowPanel(product);
-            gridPanel.add(productRowPanel);
-            addActionButtons(productRowPanel, product);
+        if (filteredProducts == null || filteredProducts.isEmpty()) {
+            gridPanel.setLayout(new GridBagLayout());
+            noProductsLabel.setFont(new Font("Arial", Font.BOLD, 14));
+            noProductsLabel.setHorizontalAlignment(SwingConstants.CENTER);
+            gridPanel.add(noProductsLabel);
+        } else {
+            gridPanel.setLayout(new GridLayout(0, 3, 10, 10));
+            for (Product product : filteredProducts) {
+                ProductRowPanel productRowPanel = new ProductRowPanel(product);
+                gridPanel.add(productRowPanel);
+                addActionButtons(productRowPanel, product);
+            }
         }
         gridPanel.revalidate();
         gridPanel.repaint();
@@ -106,9 +121,31 @@ public class AdminPanel extends JPanel {
         return button;
     }
 
+    public void handleFilterSelection(String selectedFilter){
+        switch (selectedFilter) {
+            case "Όλα τα προϊόντα":
+                updateProductGrid(productManager.getProducts());
+                break;
+            case "Μη διαθέσιμα":
+                updateProductGrid(productManager.getUnavailableProducts());
+                break;
+            case "Πιο δημοφιλή":
+//                updateProductGrid(productManager.getMostPopularProducts());
+                break;
+            default:
+                break;
+        }
+    }
+    public void handleSearchProducts(String name){
+        String selectedFilter = (String) filterDropdown.getSelectedItem();
+        List<Product> filteredProducts = productManager.filterAndSearchProducts(selectedFilter, name);
+        updateProductGrid(filteredProducts);
+    }
 
     private void handleRemoveProduct(Product product) {
         System.out.println("Product removed: " + product.getName());
+        productManager.removeProduct(product);
+        updateProductGrid(productManager.getProducts());
     }
 
     private void handleEditProduct(Product product) {

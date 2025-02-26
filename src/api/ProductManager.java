@@ -1,9 +1,6 @@
 package api;
 
-import models.Category;
-import models.Order;
-import models.OrderItem;
-import models.Product;
+import models.*;
 
 import java.util.*;
 
@@ -19,12 +16,18 @@ public class ProductManager {
     public List<Product> getProducts(){
         return products;
     }
-    public void addProduct(Product product){
-//        if (products.contains(product)){
-//            System.out.println("Product already exists.");
-//        } else {
-//            products.add(product);
-//        }
+    public String addProduct(String name, String description, Category category,String subcategory,double price,int quantity,String type){
+        try {
+            // I assume name and description are already validated in the GUI
+            if (type.equals("kg")) {
+                products.add(new WeightProduct(name, description, category, subcategory, price, quantity));
+            } else {
+                products.add(new CountProduct(name, description, category, subcategory, price, quantity));
+            }
+            return "Το προϊόν αποθηκεύτηκε επιτυχώς!";
+        } catch (Exception e) {
+            return "Παρουσιάστηκε σφάλμα κατά την αποθήκευση του προϊόντος.";
+        }
     }
 
     public void removeProduct(Product product){
@@ -36,77 +39,17 @@ public class ProductManager {
         }
     }
 
-    public void editProduct(int productId){
-            for(Product productToEdit: products){
-                if(productId == productToEdit.getId()){
-                    Scanner scanner = new Scanner(System.in);
-                    boolean editing = true;
-
-                    while (editing){
-                        System.out.println("Editing Product: " + productToEdit.getName());
-                        System.out.println("1. Edit Title");
-                        System.out.println("2. Edit Category");
-                        System.out.println("3. Edit Quantity");
-                        System.out.println("4. Exit Editing");
-                        System.out.print("Select an option: ");
-
-                        int choice = scanner.nextInt();
-                        scanner.nextLine();
-
-                        switch (choice){
-                            case 1:
-                                System.out.print("Enter new title: ");
-                                String newTitle = scanner.nextLine();
-                                productToEdit.setName(newTitle);
-                                System.out.println("Title updated to: " + newTitle);
-                                break;
-
-                            case 2:
-                                System.out.println("Available categories:");
-                                for (Category category: categoryManager.getCategories()){
-                                    System.out.println(category.getTitle());
-                                }
-                                System.out.print("Enter new category: ");
-                                String newCategory = scanner.nextLine();
-                                Category category = categoryManager.getCategoryByTitle(newCategory);
-                                System.out.println("Available subcategories: ");
-                                System.out.println(category.getSubcategories());
-                                System.out.println("Choose new subcategory: ");
-                                String newSubCategory = scanner.nextLine();
-                                newSubCategory = category.getSubcategory(newSubCategory);
-                                productToEdit.setCategory(category);
-                                productToEdit.setSubcategory(newSubCategory);
-                                System.out.println("Category updated to: " + productToEdit.getCategory().getTitle());
-                                System.out.println("SubCategory updated to: "+ productToEdit.getSubcategory());
-                                break;
-
-                            case 3:
-                                System.out.print("Enter new available quantity: ");
-                                int newQuantity = scanner.nextInt();
-                                scanner.nextLine();
-                                if (newQuantity >= 0) {
-                                    productToEdit.setQuantity(newQuantity);
-                                    System.out.println("Quantity updated to: " + newQuantity);
-                                } else {
-                                    System.out.println("Invalid quantity. Quantity cannot be negative.");
-                                }
-                                break;
-
-                            case 4:
-                                editing = false;
-                                System.out.println("Exiting edit mode.");
-                                break;
-
-                            default:
-                                System.out.println("Invalid option. Please choose again.");
-                                break;
-                        }
-                    }
-                }
-            }
+    public String editProduct(Product product,String newName, String newDescription, Category newCategory, String newSubcategory,double newPrice,int newQuantity){
+           product.setName(newName);
+           product.setDescription(newDescription);
+           product.setCategory(newCategory);
+           product.setSubcategory(newSubcategory);
+           product.setPrice(newPrice);
+           product.setQuantity(newQuantity);
+           return "Το προϊόν επεξεργάστηκε επιτυχώς!";
         }
 
-        public List<Product> mostPopularProduct(List<Order> totalOrders){
+        public List<Product> getMostPopularProducts(List<Order> totalOrders){
             Map<Product, Integer> products = new HashMap<>();
 
             for (Order order: totalOrders){
@@ -149,16 +92,11 @@ public class ProductManager {
                     unavailableProducts.add(product);
                 }
             }
-            if (unavailableProducts.isEmpty()){
-                return null;
-            }
             return unavailableProducts;
          }
 
-    public void giveProducts(String title, String category, String subcategory){
+    public List<Product> giveProducts(List<Product> products,String title, String category, String subcategory){
         List<Product> results = new ArrayList<>();
-        Scanner scanner = new Scanner(System.in);
-
         for (Product product : products) {
             boolean matchesTitle = title == null || product.getName().toLowerCase().contains(title.toLowerCase());
             boolean matchesCategory = category == null || product.getCategory().getTitle().toLowerCase().contains(category.toLowerCase());
@@ -169,19 +107,39 @@ public class ProductManager {
             }
         }
         if (results.isEmpty()) {
-            System.out.println("No products found.");
-        } else {
-            System.out.println("Search Results:");
-            for (Product product : results) {
-                System.out.println("ID: " + product.getId() + ", Name: " + product.getName() + ", Category: " + product.getCategory().getTitle() + ", Subcategory: " + product.getSubcategory());
-            }
-            System.out.println();
-            System.out.println("Give the ID of the product you want to see:");
-            int choice = scanner.nextInt();
-            scanner.nextLine();
-            viewProduct(choice, results);
-        }
+            System.out.println("No products found.");}
+        return results;
+
+//        } else {
+//            System.out.println("Search Results:");
+//            for (Product product : results) {
+//                System.out.println("ID: " + product.getId() + ", Name: " + product.getName() + ", Category: " + product.getCategory().getTitle() + ", Subcategory: " + product.getSubcategory());
+//            }
+//            System.out.println();
+//            System.out.println("Give the ID of the product you want to see:");
+//            int choice = scanner.nextInt();
+//            scanner.nextLine();
+//            viewProduct(choice, results);
+//        }
     }
+    public List<Product> filterAndSearchProducts(String filter, String name) {
+        List<Product> filteredProducts;
+        switch (filter) {
+            case "Όλα τα προϊόντα":
+                filteredProducts = getProducts();
+                break;
+            case "Μη διαθέσιμα":
+                filteredProducts = getUnavailableProducts();
+                break;
+            case "Πιο δημοφιλή":
+                filteredProducts = new ArrayList<>();
+                break;
+            default:
+                filteredProducts = new ArrayList<>();
+        }
+        return giveProducts(filteredProducts, name, null, null);
+    }
+
     public void viewProduct(int productId, List<Product> products){
         boolean productFound = false;
         for(Product product: products) {
@@ -199,6 +157,7 @@ public class ProductManager {
             System.out.println("Product with ID " + productId + " does not exist.");
         }
     }
+
     public void getAllProducts(){
         if (products.isEmpty()) {
             System.out.println("No products available.");

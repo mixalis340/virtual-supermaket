@@ -2,6 +2,8 @@ package models;
 
 import api.ProductManager;
 
+import java.util.List;
+
 public abstract class User {
     private String username;
     private String password;
@@ -26,8 +28,8 @@ public abstract class User {
         return role.toLowerCase();
     }
 
-    public void giveProducts(String title, String category, String subcategory){
-        productManager.giveProducts(title,category,subcategory);
+    public List<Product> giveProducts(List<Product> products,String title, String category, String subcategory){
+        return productManager.giveProducts(products,title,category,subcategory);
     }
     public abstract boolean login();
     public abstract boolean logout();

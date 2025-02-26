@@ -26,7 +26,7 @@ public class Main {
         userManager.registerUser(admin);
 
 
-        MainFrame mainFrame = new MainFrame(userManager, products, categoryManager);
+        MainFrame mainFrame = new MainFrame(userManager, products, categoryManager, productManager);
 
 //        int[] array = {5,5,5,5};
 //        test(array);

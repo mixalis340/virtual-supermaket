@@ -89,7 +89,6 @@ public abstract class ProductFormPanel extends JPanel {
 
     private void addListeners() {
         saveButton.addActionListener(e -> handleSave());
-        parentFrame.getBackItem().addActionListener(e-> {clearForm(); parentFrame.switchPanel("Admin");});
         categoryComboBox.addActionListener(e -> loadSubCategories());
         subCategoryComboBox.addActionListener(e -> displaySubcategoryType());
     }
@@ -180,7 +179,8 @@ public abstract class ProductFormPanel extends JPanel {
         if (resultMessage.equals("Το προϊόν αποθηκεύτηκε επιτυχώς!") || resultMessage.equals("Το προϊόν επεξεργάστηκε επιτυχώς!")) {
             clearForm();
             statusLabel.setText(resultMessage);
-            adminPanel.updateProductGrid(productManager.getProducts());
+//            adminPanel.updateProductGrid(productManager.getProducts());
+            adminPanel.getProductGridPanel().updateProductGridPanel(productManager.getProducts());
             statusLabel.setForeground(Color.GREEN);
         } else {
             statusLabel.setText(resultMessage);

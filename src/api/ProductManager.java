@@ -6,15 +6,29 @@ import java.util.*;
 
 public class ProductManager {
     private List<Product> products;
+    private List<OrderItem> orderItems;
     private CategoryManager categoryManager;
 
     public ProductManager(CategoryManager categoryManager, List<Product> products){
         this.categoryManager = categoryManager;
         this.products = products;
+        this.orderItems = initializeOrderItems();
     }
 
+    
     public List<Product> getProducts(){
         return products;
+    }
+    public List<OrderItem> initializeOrderItems(){
+        List<OrderItem> orderItems = new ArrayList<>();
+        for (Product product : products) {
+            orderItems.add(new OrderItem(product, 0));
+        }
+        return orderItems;
+    }
+
+    public List<OrderItem> getOrderItems(){
+        return orderItems;
     }
     public String addProduct(String name, String description, Category category,String subcategory,double price,int quantity,String type){
         try {

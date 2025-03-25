@@ -3,39 +3,52 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Cart {
-    private ArrayList<OrderItem> items;
+    private ArrayList<OrderItem> cartItems;
 
     public Cart(){
-        this.items = new ArrayList<>();
+        this.cartItems = new ArrayList<>();
     }
 
-    public void addProduct(Product product, int quantity){
-        if (quantity <=0){
-            System.out.println("Quantity must be greater than zero.");
-            return;
+    public void addProductToCart(Product product){
+        cartItems.add(new OrderItem(product,1));
+        System.out.println("Product "+product.getName()+" added to cart!");
+    }
+
+    public void increaseProductQuantity(Product product){
+        OrderItem orderItem = findOrderItem(product);
+        if (orderItem!=null){
+            orderItem.increaseQuantity();
+            System.out.println("Updated " + product.getName() + " to quantity: " + orderItem.getQuantity());
         }
-        if (quantity > product.getQuantity()) {
-            System.out.println("Cannot add " + quantity + " " + product.getName() + " to the cart. Not enough stock available.");
-            return;
-        }
-        for (OrderItem item : items) {
-            if (item.getProduct().getId() == product.getId()) {
-                if (item.getQuantity() + quantity > product.getQuantity()) {
-                    System.out.println("Cannot add " + quantity + " more. Only " + product.getQuantity() + " available.");
-                    return;
-                }
-                item.setQuantity(item.getQuantity() + quantity);
-                return;
+    }
+
+    public String decreaseQuantity(Product product){
+        OrderItem orderItem = findOrderItem(product);
+        if (orderItem!= null) {
+            if (orderItem.getQuantity() == 1) {
+                removeItem(product.getId());
+                System.out.println(product.getName()+ " removed!");
+                return "product removed";
+            }
+            else{
+                orderItem.decreaseQuantity();
+                System.out.println("Updated " + product.getName() + " to quantity: " + orderItem.getQuantity());
+                return "quantity decreased";
             }
         }
-        items.add(new OrderItem(product, quantity, product.getPrice()));
+        return null;
     }
-
-    public void removeItem(int productId){
-        items.removeIf(item -> item.getProduct().getId() == productId);
+    public void removeItem(int productId) {
+        cartItems.removeIf(item -> {
+            if (item.getProduct().getId() == productId) {
+                System.out.println("Removed product: " + item.getProduct().getName());
+                return true; // Remove this item
+            }
+            return false; // Keep the item
+        });
     }
     public boolean updateItemQuantity(int productId, int newQuantity){
-        for (OrderItem item : items) {
+        for (OrderItem item : cartItems) {
             if (item.getProduct().getId() == productId) {
                 if (newQuantity <= item.getProduct().getQuantity()) {
                     item.setQuantity(newQuantity);
@@ -48,7 +61,7 @@ public class Cart {
     }
     public double getTotalCartValue(){
         double value = 0.0;
-        for (OrderItem item: items){
+        for (OrderItem item: cartItems){
             value += item.getTotalPrice();
         }
         return value;
@@ -56,7 +69,7 @@ public class Cart {
     public void displayCartInfo(){
         System.out.println("Info for this Cart:");
         int i = 0;
-        for (OrderItem item: items){
+        for (OrderItem item: cartItems){
             i++;
             System.out.println("Product " + i);
             System.out.println(item.getProduct().getName());
@@ -69,16 +82,23 @@ public class Cart {
         System.out.println();
     }
     public List<OrderItem> getItems(){
-        return items;
+        return cartItems;
     }
     public List<Product> getCartProducts(){
         List<Product> products = new ArrayList<>();
-        for(OrderItem item: items){
+        for(OrderItem item: cartItems){
             products.add(item.getProduct());
         }
         return products;
     }
+    public OrderItem findOrderItem(Product product){
+        for (OrderItem orderItem: cartItems){
+            if (orderItem.getProduct().getId() == product.getId())
+                return orderItem;
+        }
+        return null;
+    }
     public void clearCart(){
-        items.clear();
+        cartItems.clear();
     }
 }

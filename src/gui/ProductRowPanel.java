@@ -33,7 +33,9 @@ public class ProductRowPanel extends JPanel {
 
             add(detailsPanel,BorderLayout.CENTER);
         }
-
+        public Product getProduct(){
+            return product;
+        }
         private JLabel createProductLabel(String text) {
             JLabel label = new JLabel(text);
             label.setHorizontalAlignment(SwingConstants.CENTER);

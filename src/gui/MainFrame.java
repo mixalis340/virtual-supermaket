@@ -7,6 +7,8 @@ import java.util.List;
 import api.CategoryManager;
 import api.ProductManager;
 import api.UserManager;
+import interfaces.CartActionListener;
+import models.Cart;
 import models.Category;
 import models.Product;
 import models.User;
@@ -17,13 +19,20 @@ public class MainFrame extends JFrame {
     private JMenuBar menuBar;
     private CardLayout cardLayout;
     private AdminPanel adminPanel;
+    private CustomerPanel customerPanel;
     private JPanel contentPanel;
     private ProductRegistrationPanel productRegistrationPanel;
     private ProductEditPanel productEditPanel;
-    private List<Product> products;
+    private CartPanel cartPanel;
     private ProductManager productManager;
     private JMenuItem backItem;
     private CategoryManager categoryManager;
+
+    public String getCurrentPanelName() {
+        return currentPanelName;
+    }
+
+    public String currentPanelName;
 
     public MainFrame(UserManager userManager, List<Product> products, CategoryManager categoryManager,ProductManager productManager){
         setTitle("Virtual-Supermarket");
@@ -32,21 +41,23 @@ public class MainFrame extends JFrame {
 
         this.cardLayout = new CardLayout();
         this.contentPanel = new JPanel(cardLayout);
-        this.products = products;
         this.backItem = new JMenuItem("Back");
+        this.productManager = productManager;
         this.categoryManager = categoryManager;
 
-        adminPanel = new AdminPanel(this, products, productManager); // Pass MainFrame to allow screen switching
+        adminPanel = new AdminPanel(this, productManager); // Pass MainFrame to allow screen switching
         loginPanel = new LoginPanel(userManager, this);
         productRegistrationPanel = new ProductRegistrationPanel(this, categoryManager, productManager,adminPanel);
-        productEditPanel = new ProductEditPanel(this, null, categoryManager,productManager,adminPanel);// Add Product Registration screen
-
-
+        productEditPanel = new ProductEditPanel(this, null, categoryManager,productManager,adminPanel);
+        cartPanel = new CartPanel(new Cart(),null);
+        customerPanel = new CustomerPanel(productManager,this,cartPanel);
         // Add all panels to CardLayout
         contentPanel.add(adminPanel, "Admin");
+        contentPanel.add(customerPanel,"Customer");
         contentPanel.add(loginPanel, "Login");
         contentPanel.add(productEditPanel, "ProductEdit");
         contentPanel.add(productRegistrationPanel,"ProductRegistration");
+        contentPanel.add(cartPanel,"Cart");
 
         menuBar = createMenuBar();
         setLayout(new BorderLayout());
@@ -55,19 +66,26 @@ public class MainFrame extends JFrame {
 
         setLocationRelativeTo(null);
 
-        switchPanel("Admin");
+        switchPanel("Customer");
         setVisible(true);
     }
     public JMenuItem getBackItem(){
         return backItem;
     }
     public void switchPanel(String panelName) {
+        this.currentPanelName = panelName;
         cardLayout.show(contentPanel, panelName);
         backItem.setVisible(!"Login".equals(panelName));
         System.out.println("Switching to "+panelName);
     }
 
+    public void switchToCartPanel(CartActionListener cartActionListener){
+        this.currentPanelName = "Cart";
+        cartPanel.setCartActionListener(cartActionListener);
+        cardLayout.show(contentPanel,"Cart");
+    }
     public void switchToEditProductPanel(Product product){
+        this.currentPanelName = "ProductEdit";
         productEditPanel.updateProductData(product);
         productEditPanel.revalidate();
         productEditPanel.repaint();
@@ -87,7 +105,8 @@ public class MainFrame extends JFrame {
         exitItem.addActionListener(e -> System.exit(0));
         menu.add(exitItem);
 
-        backItem.addActionListener(e -> switchPanel("Admin"));
+        backItem = new JMenuItem("Back");
+        backItem.addActionListener(e -> handleBackNavigation());
         menu.add(backItem);
 
         JMenuItem backToLogin = new JMenuItem("Back to Login");
@@ -96,5 +115,21 @@ public class MainFrame extends JFrame {
 
         menuBar.add(menu);
         return menuBar;
+    }
+
+    private void handleBackNavigation() {
+        System.out.println("I am in "+currentPanelName);
+        switch (currentPanelName) {
+            case "Cart":
+                switchPanel("Customer");
+                customerPanel.getProductGridPanel().refreshUI(null);
+                break;
+            case "ProductEdit", "ProductRegistration":
+                switchPanel("Admin");
+                break;
+            default:
+                switchPanel("Login");
+                break;
+        }
     }
 }
